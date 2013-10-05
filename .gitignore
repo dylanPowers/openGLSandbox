@@ -33,5 +33,4 @@ proguard/
 libs/
 
 # Gradle
-gradle/
 .gradle/
