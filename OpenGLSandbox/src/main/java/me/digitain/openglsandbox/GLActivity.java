@@ -19,8 +19,10 @@ public class GLActivity extends Activity {
     mGLSurfaceView = new GLSurfaceView(this);
 
     // Check the OpenGL version for 2.0 support
-    final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-    final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+    final ActivityManager activityManager =
+            (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+    final ConfigurationInfo configurationInfo =
+            activityManager.getDeviceConfigurationInfo();
     final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x00020000;
 
     if (supportsEs2) {
