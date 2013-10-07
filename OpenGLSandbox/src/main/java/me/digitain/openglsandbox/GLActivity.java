@@ -30,7 +30,7 @@ public class GLActivity extends Activity {
       mGLSurfaceView.setEGLContextClientVersion(2);
 
       // Set the renderer to the demo renderer
-      mGLSurfaceView.setRenderer(new LessonOneRenderer());
+      mGLSurfaceView.setRenderer(new LessonOneRenderer(getAssets()));
     } else {
       // We'll give up if there's no OpenGL 2.0 support
       return;
