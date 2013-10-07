@@ -227,13 +227,21 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
   public void onSurfaceChanged(GL10 gl10, int width, int height) {
     GLES20.glViewport(0, 0, width, height);
 
-    final float ratio = (float) width / height;
-    final float left = -ratio;
-    final float right = ratio;
-    final float bottom = -1.0f;
-    final float top = 1.0f;
+    float left = -1.0f;
+    float right = 1.0f;
+    float bottom = -1.0f;
+    float top = 1.0f;
     final float near = 1.0f;
     final float far = 10.0f;
+
+    final float ratio = (float) width / height;
+    if (ratio > 1.0) { // Horizontal
+      left = -ratio;
+      right = ratio;
+    } else { // Vertical
+      bottom = - (1 / ratio);
+      top = 1 / ratio;
+    }
 
     Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
   }
