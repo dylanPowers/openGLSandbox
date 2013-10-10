@@ -25,3 +25,20 @@ android {
         targetSdkVersion 16
     }
 }
+
+// NDK build support
+task buildNative(type: Exec) {
+    // A lot of samples don't specify the build directory.
+    commandLine 'ndk-build', '-C', 'src/main'
+}
+tasks.withType(Compile) { compileTask -> compileTask.dependsOn 'buildNative' }
+
+clean.dependsOn 'cleanNative'
+task cleanNative(type: Exec) {
+    commandLine 'ndk-build', 'clean', '-C', 'src/main'
+}
+
+// Copies the libs to the apk.
+tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
+    pkgTask.jniDir new File(projectDir, 'src/main/libs')
+}
