@@ -1,5 +1,16 @@
 #include "renderer.h"
 
-Renderer::Renderer() {
-  int b = 1 + 3;
-}
+//static void Renderer::onDrawFrame() {
+//
+//
+//}
+
+//static void Renderer::onSurfaceCreated() {
+//
+//
+//}
+//
+//static void Renderer::onSurfaceChanged(int width, int height) {
+//
+//
+//}
