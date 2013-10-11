@@ -3,43 +3,26 @@
 
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
+#include <string>
+using std::string;
 
 class Renderer {
-
-
   public:
-    static void onDrawFrame() {
-      glClear(GL_COLOR_BUFFER_BIT);
-    }
+    Renderer();
 
-    static void onSurfaceCreated() {
-      glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-    }
-
-    static void onSurfaceChanged(int width, int height) {
-      glViewport(0, 0, width, height);
-
-      float left = -1.0;
-      float right = 1.0;
-      float bottom = -1.0;
-      float top = 1.0;
-      const float near = 1.0;
-      const float far = 10.0;
-
-      float ratio = (float) width / height;
-      if (ratio > 1.0) {
-        left = -ratio;
-        right = ratio;
-      } else {
-        bottom = - (1 / ratio);
-        top = 1 / ratio;
-      }
-
-      mat4::frustum(m_projection_matrix, 0, left, right, bottom, top, near, far);
-    }
+    void onDrawFrame();
+    void onSurfaceChanged(int width, int height);
+    void onSurfaceCreated(const string& fragment_shader,
+                          const string& vertex_shader);
 
   private:
-    static mat4 m_projection_matrix = mat4();
+    float m_projection_matrix[4][4];
+
+    static const float m_triangle1_vertices[];
+    static const float m_triangle2_vertices[];
+    static const float m_triangle3_vertices[];
+    int compileProgram(int fragment_shader_handle, int vertex_shader_handle);
+    int createShader(const string&, int shader_type);
 };
 
 

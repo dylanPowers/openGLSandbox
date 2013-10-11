@@ -23,9 +23,9 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
   private static final String TAG = "OpenGLSandbox Renderer";
 
   // Model data in float buffers
-  private final FloatBuffer mTriangle1Vertices;
-  private final FloatBuffer mTriangle2Vertices;
-  private final FloatBuffer mTriangle3Vertices;
+//  private final FloatBuffer mTriangle1Vertices;
+//  private final FloatBuffer mTriangle2Vertices;
+//  private final FloatBuffer mTriangle3Vertices;
 
   private final int mBytesPerFloat = 4; // DUH!!!?????
 
@@ -34,59 +34,61 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
   private int mMVPMatrixHandle;
 
   public LessonOneRenderer(AssetManager assets) {
-
+    RendererJniWrapper.construct();
     mAssetsManager = assets;
 
-    // A red, green, and blue triangle
-    final float[] triangle1VerticesData = {
-        // X, Y, Z,
-        // R, G, B, A
-        -0.5f, -0.25f, 0.0f,
-        1.0f, 0.0f, 0.0f, 1.0f,
 
-        0.5f, -0.25f, 0.0f,
-        0.0f, 0.0f, 1.0f, 1.0f,
-
-        0.0f, 0.559016994f, 0.0f,
-        0.0f, 1.0f, 0.0f, 1.0f
-    };
-
-    // This triangle is yellow, cyan, and magenta.
-    final float[] triangle2VerticesData = {
-        // X, Y, Z,
-        // R, G, B, A
-        -0.5f, -0.25f, 0.0f,
-        1.0f, 1.0f, 0.0f, 1.0f,
-
-        0.5f, -0.25f, 0.0f,
-        0.0f, 1.0f, 1.0f, 1.0f,
-
-        0.0f, 0.559016994f, 0.0f,
-        1.0f, 0.0f, 1.0f, 1.0f
-    };
-
-    // This triangle is white, gray, and black.
-    final float[] triangle3VerticesData = {
-        // X, Y, Z,
-        // R, G, B, A
-        -0.5f, -0.25f, 0.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-
-        0.5f, -0.25f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f,
-
-        0.0f, 0.559016994f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-    // Init our buffers
-    mTriangle1Vertices = allocateVertexBuffer(triangle1VerticesData);
-    mTriangle2Vertices = allocateVertexBuffer(triangle2VerticesData);
-    mTriangle3Vertices = allocateVertexBuffer(triangle3VerticesData);
-
-    mTriangle1Vertices.put(triangle1VerticesData).position(0);
-    mTriangle2Vertices.put(triangle2VerticesData).position(0);
-    mTriangle3Vertices.put(triangle3VerticesData).position(0);
+//
+//    // A red, green, and blue triangle
+//    final float[] triangle1VerticesData = {
+//        // X, Y, Z,
+//        // R, G, B, A
+//        -0.5f, -0.25f, 0.0f,
+//        1.0f, 0.0f, 0.0f, 1.0f,
+//
+//        0.5f, -0.25f, 0.0f,
+//        0.0f, 0.0f, 1.0f, 1.0f,
+//
+//        0.0f, 0.559016994f, 0.0f,
+//        0.0f, 1.0f, 0.0f, 1.0f
+//    };
+//
+//    // This triangle is yellow, cyan, and magenta.
+//    final float[] triangle2VerticesData = {
+//        // X, Y, Z,
+//        // R, G, B, A
+//        -0.5f, -0.25f, 0.0f,
+//        1.0f, 1.0f, 0.0f, 1.0f,
+//
+//        0.5f, -0.25f, 0.0f,
+//        0.0f, 1.0f, 1.0f, 1.0f,
+//
+//        0.0f, 0.559016994f, 0.0f,
+//        1.0f, 0.0f, 1.0f, 1.0f
+//    };
+//
+//    // This triangle is white, gray, and black.
+//    final float[] triangle3VerticesData = {
+//        // X, Y, Z,
+//        // R, G, B, A
+//        -0.5f, -0.25f, 0.0f,
+//        1.0f, 1.0f, 1.0f, 1.0f,
+//
+//        0.5f, -0.25f, 0.0f,
+//        0.5f, 0.5f, 0.5f, 1.0f,
+//
+//        0.0f, 0.559016994f, 0.0f,
+//        0.0f, 0.0f, 0.0f, 1.0f
+//    };
+//
+//    // Init our buffers
+//    mTriangle1Vertices = allocateVertexBuffer(triangle1VerticesData);
+//    mTriangle2Vertices = allocateVertexBuffer(triangle2VerticesData);
+//    mTriangle3Vertices = allocateVertexBuffer(triangle3VerticesData);
+//
+//    mTriangle1Vertices.put(triangle1VerticesData).position(0);
+//    mTriangle2Vertices.put(triangle2VerticesData).position(0);
+//    mTriangle3Vertices.put(triangle3VerticesData).position(0);
   }
 
   private FloatBuffer allocateVertexBuffer(float[] verticesData) {
@@ -165,7 +167,7 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
   private int mColorHandle;
   @Override
   public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-    RendererJniWrapper.onSurfaceCreated();
+//    RendererJniWrapper.onSurfaceCreated();
 //    GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 //
 //    final float eyeX = 0.0f;
@@ -185,8 +187,9 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
 //                      lookX, lookY, lookZ,
 //                      upX, upY, upZ);
 //
-//    final String vertexShader = readAsset("VertexShader.glsl");
-//    final String fragmentShader = readAsset("FragmentShader.glsl");
+    final String vertexShader = readAsset("VertexShader.glsl");
+    final String fragmentShader = readAsset("FragmentShader.glsl");
+    RendererJniWrapper.onSurfaceCreated(fragmentShader, vertexShader);
 //
 //    int vertexShaderHandle = createShader(vertexShader, GLES20.GL_VERTEX_SHADER);
 //    int fragmentShaderHandle = createShader(fragmentShader, GLES20.GL_FRAGMENT_SHADER);

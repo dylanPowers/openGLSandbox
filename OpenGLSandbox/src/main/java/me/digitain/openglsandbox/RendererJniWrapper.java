@@ -9,7 +9,9 @@ public class RendererJniWrapper {
       System.loadLibrary("renderer");
   }
 
+  public static native void construct();
   public static native void onDrawFrame();
-  public static native void onSurfaceCreated();
   public static native void onSurfaceChanged(int width, int height);
+  public static native void onSurfaceCreated(String fragmentShader,
+                                             String vertexShader);
 }
