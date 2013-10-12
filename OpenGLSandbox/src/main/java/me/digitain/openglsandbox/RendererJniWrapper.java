@@ -6,7 +6,8 @@ package me.digitain.openglsandbox;
 public class RendererJniWrapper {
 
   static {
-      System.loadLibrary("renderer");
+    System.loadLibrary("stlport_shared");
+    System.loadLibrary("renderer");
   }
 
   public static native void construct();

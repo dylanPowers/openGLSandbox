@@ -40,51 +40,20 @@ const float Renderer::m_triangle3_vertices[] = {
 };
 
 Renderer::Renderer() {
-
+  m_color_handle = 0;
+  m_MVP_matrix_handle = 0;
+  m_position_handle = 0;
 }
 
-int Renderer::compileProgram(int fragment_shader_handle,
-                             int vertex_shader_handle) {
-  int program_handle = glCreateProgram();
-  string program_error;
-
-  if (program_handle != 0) {
-    glAttachShader(program_handle, vertex_shader_handle);
-    glAttachShader(program_handle, fragment_shader_handle);
-
-    glBindAttribLocation(program_handle, 0, "a_Position");
-    glBindAttribLocation(program_handle, 1, "a_Color");
-
-    glLinkProgram(program_handle);
-
-    int compile_status;
-    glGetProgramiv(program_handle, GL_LINK_STATUS, &compile_status);
-
-    if (compile_status == 0) {
-      int log_length;
-      glGetProgramiv(program_handle, GL_INFO_LOG_LENGTH, &log_length);
-      char* error_msg = new char[log_length];
-      glGetProgramInfoLog(program_handle, log_length, NULL, error_msg);
-      program_error = error_msg;
-      glDeleteProgram(program_handle);
-      program_handle = 0;
-    }
-  }
-  if (program_handle == 0) {
-    throw new runtime_error("Error compiling the GLES 2.0 shader program: " +
-                            program_error);
-  }
-
-  return program_handle;
-}
-
-int Renderer::createShader(const string& shader_source, int shader_type) {
+int Renderer::compileShader(const string& shader_source, int shader_type) {
   int shader_handle = glCreateShader(shader_type);
   string shader_error;
 
   if (shader_handle != 0) {
+    const char* source_str = shader_source.c_str();
+    const int str_length = shader_source.length();
     glShaderSource(shader_handle, 1,
-                   &(shader_source.c_str()), shader_source.length());
+                   &source_str, &str_length);
     glCompileShader(shader_handle);
 
     int compile_status;
@@ -114,14 +83,54 @@ int Renderer::createShader(const string& shader_source, int shader_type) {
         break;
     }
     error += " shader. Shader Log: " + shader_error;
-    throw new runtime_error(error);
+    LOGE("%s", error.c_str());
   }
 
   return shader_handle;
 }
 
+int Renderer::linkProgram(int fragment_shader_handle,
+                          int vertex_shader_handle) {
+  int program_handle = glCreateProgram();
+  string program_error;
+
+  if (program_handle != 0) {
+    glAttachShader(program_handle, vertex_shader_handle);
+    glAttachShader(program_handle, fragment_shader_handle);
+
+    glBindAttribLocation(program_handle, 0, "a_Position");
+    glBindAttribLocation(program_handle, 1, "a_Color");
+
+    glLinkProgram(program_handle);
+
+    int compile_status;
+    glGetProgramiv(program_handle, GL_LINK_STATUS, &compile_status);
+
+    if (compile_status == 0) {
+      int log_length;
+      glGetProgramiv(program_handle, GL_INFO_LOG_LENGTH, &log_length);
+      char* error_msg = new char[log_length];
+      glGetProgramInfoLog(program_handle, log_length, NULL, error_msg);
+      program_error = error_msg;
+      glDeleteProgram(program_handle);
+      program_handle = 0;
+    }
+  }
+  if (program_handle == 0) {
+//    throw new runtime_error("Error compiling the GLES 2.0 shader program: " +
+//                            program_error);
+    LOGE("%s",
+         ("Error compiling the GLES 2.0 shader program: " + program_error).c_str());
+  }
+
+  return program_handle;
+}
+
 void Renderer::onDrawFrame() {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+  clock_t time = clock();
+
 }
 
 void Renderer::onSurfaceCreated(const string& fragment_shader,
@@ -130,13 +139,17 @@ void Renderer::onSurfaceCreated(const string& fragment_shader,
 
   int vertex_shader_handle = 0;
   int fragment_shader_handle = 0;
-  try {
-    vertex_shader_handle = createShader(vertex_shader, GL_VERTEX_SHADER);
-    fragment_shader_handle = createShader(fragment_shader, GL_FRAGMENT_SHADER);
-  } catch (runtime_error error) {
 
+  vertex_shader_handle = compileShader(vertex_shader, GL_VERTEX_SHADER);
+  fragment_shader_handle = compileShader(fragment_shader, GL_FRAGMENT_SHADER);
+  if (vertex_shader_handle != 0 && fragment_shader_handle != 0) {
+    int program_handle = linkProgram(fragment_shader_handle,
+                                     vertex_shader_handle);
+    m_MVP_matrix_handle = glGetUniformLocation(program_handle, "u_MVPMatrix");
+    m_position_handle = glGetAttribLocation(program_handle, "a_Position");
+    m_color_handle = glGetAttribLocation(program_handle, "a_Color");
+    glUseProgram(program_handle);
   }
-
 }
 
 void Renderer::onSurfaceChanged(int width, int height) {
