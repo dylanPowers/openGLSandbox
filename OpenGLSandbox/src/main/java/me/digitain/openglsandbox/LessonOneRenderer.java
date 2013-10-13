@@ -86,7 +86,7 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
 //    mTriangle2Vertices = allocateVertexBuffer(triangle2VerticesData);
 //    mTriangle3Vertices = allocateVertexBuffer(triangle3VerticesData);
 //
-//    mTriangle1Vertices.put(triangle1VerticesData).position(0);
+//    mTriangle1Vertices.put(t riangle1VerticesData).position(0);
 //    mTriangle2Vertices.put(triangle2VerticesData).position(0);
 //    mTriangle3Vertices.put(triangle3VerticesData).position(0);
   }

@@ -41,8 +41,26 @@ const float Renderer::m_triangle3_vertices[] = {
 
 Renderer::Renderer() {
   m_color_handle = 0;
+  m_model_matrix = Mat4();
   m_MVP_matrix_handle = 0;
+  m_MVP_matrix = Mat4();
   m_position_handle = 0;
+  m_projection_matrix = Mat4();
+  m_view_matrix = Mat4();
+}
+
+Renderer::~Renderer() {
+
+}
+
+Renderer::Renderer(const Renderer& other) {
+  m_color_handle = other.m_color_handle;
+  m_model_matrix = other.m_model_matrix;
+  m_MVP_matrix_handle = other.m_MVP_matrix_handle;
+  m_MVP_matrix = other.m_MVP_matrix;
+  m_position_handle = other.m_position_handle;
+  m_projection_matrix = other.m_projection_matrix;
+  m_view_matrix = other.m_view_matrix;
 }
 
 int Renderer::compileShader(const string& shader_source, int shader_type) {
@@ -89,6 +107,25 @@ int Renderer::compileShader(const string& shader_source, int shader_type) {
   return shader_handle;
 }
 
+void Renderer::drawTriangle(const float* triangle) {
+  const float* triangle_pos = triangle + POSITION_OFFSET * sizeof(float);
+  glVertexAttribPointer(m_position_handle, POSITION_DATA_SIZE,
+                        GL_FLOAT, false, STRIDE_BYTES, triangle_pos);
+  glEnableVertexAttribArray(m_position_handle);
+
+  const float* triangle_color = triangle + COLOR_OFFSET * sizeof(float);
+  glVertexAttribPointer(m_color_handle, COLOR_DATA_SIZE,
+                        GL_FLOAT, false, STRIDE_BYTES, triangle_color);
+  glEnableVertexAttribArray(m_color_handle);
+
+  m_MVP_matrix = m_view_matrix * m_model_matrix;
+  m_MVP_matrix *= m_projection_matrix;
+
+  glUniformMatrix4fv(m_MVP_matrix_handle, 1, false,
+                     m_MVP_matrix.getBuffer());
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
 int Renderer::linkProgram(int fragment_shader_handle,
                           int vertex_shader_handle) {
   int program_handle = glCreateProgram();
@@ -129,8 +166,25 @@ int Renderer::linkProgram(int fragment_shader_handle,
 void Renderer::onDrawFrame() {
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-  clock_t time = clock();
+  clock_t ticks = clock();
+  long time_mod = ticks % (5 * CLOCKS_PER_SEC); // Rotate every 5s
+  float angle_rad = (TAU / 5 * CLOCKS_PER_SEC) * (time_mod);
 
+  m_model_matrix.setIdentity();
+  m_model_matrix.rotate(angle_rad, 0.0, 0.0, 1.0);
+  drawTriangle(m_triangle1_vertices);
+
+  m_model_matrix.setIdentity();
+  m_model_matrix.translate(0.0, -1.0, 0.0);
+  m_model_matrix.rotate(TAU / 4.0, 1.0, 0.0, 0.0);
+  m_model_matrix.rotate(angle_rad, 0.0, 0.0, 1.0);
+  drawTriangle(m_triangle2_vertices);
+
+  m_model_matrix.setIdentity();
+  m_model_matrix.translate(1.0, 0.0, 0.0);
+  m_model_matrix.rotate(TAU / 4.0, 0.0, 1.0, 0.0);
+  m_model_matrix.rotate(angle_rad, 0.0, 0.0, 1.0);
+  drawTriangle(m_triangle3_vertices);
 }
 
 void Renderer::onSurfaceCreated(const string& fragment_shader,
@@ -170,4 +224,6 @@ void Renderer::onSurfaceChanged(int width, int height) {
     bottom = - (1 / ratio);
     top = 1 / ratio;
   }
+
+  m_projection_matrix.frustum(left, right, bottom, top, near, far);
 }
