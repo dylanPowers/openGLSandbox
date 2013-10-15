@@ -1,9 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "log.h"
 #include "matrix.h"
-
-#include <android/log.h>
 
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
@@ -11,8 +10,6 @@
 #include <ctime>
 #include <string>
 using std::string;
-
-#define LOGE(...) ((void) __android_log_print(ANDROID_LOG_ERROR, "GL Renderer", __VA_ARGS__))
 
 #define POSITION_OFFSET 0
 #define POSITION_DATA_SIZE 3

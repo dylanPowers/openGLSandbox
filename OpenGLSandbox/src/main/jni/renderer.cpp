@@ -101,7 +101,7 @@ int Renderer::compileShader(const string& shader_source, int shader_type) {
         break;
     }
     error += " shader. Shader Log: " + shader_error;
-    LOGE("%s", error.c_str());
+    LOGE("Renderer", "%s", error.c_str());
   }
 
   return shader_handle;
@@ -118,8 +118,15 @@ void Renderer::drawTriangle(const float* triangle) {
                         GL_FLOAT, false, STRIDE_BYTES, triangle_color);
   glEnableVertexAttribArray(m_color_handle);
 
+  LOGD("Mult", "View * Model");
+  m_view_matrix.debugOut();
+  m_model_matrix.debugOut();
   m_MVP_matrix = m_view_matrix * m_model_matrix;
+  m_MVP_matrix.debugOut();
+  LOGD("Mult", "Result * Projection");
+  m_projection_matrix.debugOut();
   m_MVP_matrix *= m_projection_matrix;
+  m_MVP_matrix.debugOut();
 
   glUniformMatrix4fv(m_MVP_matrix_handle, 1, false,
                      m_MVP_matrix.getBuffer());
@@ -156,7 +163,7 @@ int Renderer::linkProgram(int fragment_shader_handle,
   if (program_handle == 0) {
 //    throw new runtime_error("Error compiling the GLES 2.0 shader program: " +
 //                            program_error);
-    LOGE("%s",
+    LOGE("Renderer", "%s",
          ("Error compiling the GLES 2.0 shader program: " + program_error).c_str());
   }
 
@@ -189,13 +196,15 @@ void Renderer::onDrawFrame() {
 
 void Renderer::onSurfaceCreated(const string& fragment_shader,
                                 const string& vertex_shader) {
-  glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+  glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
-  int vertex_shader_handle = 0;
-  int fragment_shader_handle = 0;
+  m_view_matrix.setLookAt(0.0, 0.0, 1.5,
+                          0.0, 0.0, -5.0,
+                          0.0, 1.0, 0.0);
 
-  vertex_shader_handle = compileShader(vertex_shader, GL_VERTEX_SHADER);
-  fragment_shader_handle = compileShader(fragment_shader, GL_FRAGMENT_SHADER);
+
+  const int vertex_shader_handle = compileShader(vertex_shader, GL_VERTEX_SHADER);
+  const int fragment_shader_handle = compileShader(fragment_shader, GL_FRAGMENT_SHADER);
   if (vertex_shader_handle != 0 && fragment_shader_handle != 0) {
     int program_handle = linkProgram(fragment_shader_handle,
                                      vertex_shader_handle);
@@ -220,9 +229,11 @@ void Renderer::onSurfaceChanged(int width, int height) {
   if (ratio > 1.0) {
     left = -ratio;
     right = ratio;
+    width *= 1 / ratio;
   } else {
     bottom = - (1 / ratio);
     top = 1 / ratio;
+    height *= ratio;
   }
 
   m_projection_matrix.frustum(left, right, bottom, top, near, far);
