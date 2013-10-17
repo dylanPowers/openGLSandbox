@@ -11,8 +11,10 @@ using std::ostringstream;
 
 #define BUFFER_SIZE 16
 #define INDEX(_col, _row) (_col * 4 + _row)
+#define SET_AT(_col, _row, _val) (m_matrix_buffer[INDEX(_col, _row)] = _val)
 
 class Mat4 {
+
   public:
     Mat4(void);
     ~Mat4(void);
@@ -26,7 +28,7 @@ class Mat4 {
                  float bottom, float top,
                  float near, float far);
     float getAt(int col, int row) const;
-    float* getBuffer(void);
+    const float* getBuffer(void);
     void rotate(float radians, float x, float y, float z);
     void setAt(int col, int row, float value);
     void setIdentity(void);

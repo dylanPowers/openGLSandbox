@@ -108,28 +108,24 @@ int Renderer::compileShader(const string& shader_source, int shader_type) {
 }
 
 void Renderer::drawTriangle(const float* triangle) {
-  const float* triangle_pos = triangle + POSITION_OFFSET * sizeof(float);
+  const float* triangle_pos = triangle + POSITION_OFFSET;
   glVertexAttribPointer(m_position_handle, POSITION_DATA_SIZE,
                         GL_FLOAT, false, STRIDE_BYTES, triangle_pos);
   glEnableVertexAttribArray(m_position_handle);
 
-  const float* triangle_color = triangle + COLOR_OFFSET * sizeof(float);
+  const float* triangle_color = triangle + COLOR_OFFSET;
   glVertexAttribPointer(m_color_handle, COLOR_DATA_SIZE,
                         GL_FLOAT, false, STRIDE_BYTES, triangle_color);
   glEnableVertexAttribArray(m_color_handle);
 
-  LOGD("Mult", "View * Model");
-  m_view_matrix.debugOut();
-  m_model_matrix.debugOut();
-  m_MVP_matrix = m_view_matrix * m_model_matrix;
-  m_MVP_matrix.debugOut();
-  LOGD("Mult", "Result * Projection");
-  m_projection_matrix.debugOut();
-  m_MVP_matrix *= m_projection_matrix;
-  m_MVP_matrix.debugOut();
+//  m_projection_matrix.debugOut();
+//  m_view_matrix.debugOut();
+//  m_model_matrix.debugOut();
 
-  glUniformMatrix4fv(m_MVP_matrix_handle, 1, false,
-                     m_MVP_matrix.getBuffer());
+  m_MVP_matrix = m_projection_matrix * m_view_matrix * m_model_matrix;
+//  m_MVP_matrix.debugOut();
+//  LOGD("------", "--------");
+  glUniformMatrix4fv(m_MVP_matrix_handle, 1, false, m_MVP_matrix.getBuffer());
   glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -174,8 +170,8 @@ void Renderer::onDrawFrame() {
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
   clock_t ticks = clock();
-  long time_mod = ticks % (5 * CLOCKS_PER_SEC); // Rotate every 5s
-  float angle_rad = (TAU / 5 * CLOCKS_PER_SEC) * (time_mod);
+  long time_mod = ticks % (2 * CLOCKS_PER_SEC); // Rotate every 5s
+  float angle_rad = (TAU / (2 * CLOCKS_PER_SEC)) * (time_mod);
 
   m_model_matrix.setIdentity();
   m_model_matrix.rotate(angle_rad, 0.0, 0.0, 1.0);
@@ -198,8 +194,8 @@ void Renderer::onSurfaceCreated(const string& fragment_shader,
                                 const string& vertex_shader) {
   glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
-  m_view_matrix.setLookAt(0.0, 0.0, 1.5,
-                          0.0, 0.0, -5.0,
+  m_view_matrix.setLookAt(0.0, 0.0, 1.5f,
+                          0.0, 0.0, -5.0f,
                           0.0, 1.0, 0.0);
 
 
@@ -218,22 +214,20 @@ void Renderer::onSurfaceCreated(const string& fragment_shader,
 void Renderer::onSurfaceChanged(int width, int height) {
   glViewport(0, 0, width, height);
 
-  float left = -1.0;
-  float right = 1.0;
-  float bottom = -1.0;
-  float top = 1.0;
-  const float near = 1.0;
-  const float far = 10.0;
+  float left = -1.0f;
+  float right = 1.0f;
+  float bottom = -1.0f;
+  float top = 1.0f;
+  const float near = 1.0f;
+  const float far = 10.0f;
 
-  float ratio = (float) width / height;
+  const float ratio = (float) width / height;
   if (ratio > 1.0) {
+    bottom = -1 / ratio;
+    top = 1 / ratio;
+  } else {
     left = -ratio;
     right = ratio;
-    width *= 1 / ratio;
-  } else {
-    bottom = - (1 / ratio);
-    top = 1 / ratio;
-    height *= ratio;
   }
 
   m_projection_matrix.frustum(left, right, bottom, top, near, far);

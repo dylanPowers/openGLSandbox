@@ -22,7 +22,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class LessonOneRenderer implements GLSurfaceView.Renderer {
   private static final String TAG = "OpenGLSandbox Renderer";
 
-  private static final boolean RUN_NATIVE = false;
+  private static final boolean RUN_NATIVE = true;
 
   // Model data in float buffers
   private final FloatBuffer mTriangle1Vertices;
@@ -178,7 +178,7 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
 
       final float eyeX = 0.0f;
       final float eyeY = 0.0f;
-      final float eyeZ = 1.5f;
+      final float eyeZ = 1.0f;
 
       final float lookX = 0.0f;
       final float lookY = 0.0f;
@@ -248,14 +248,16 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
 
       final float ratio = (float) width / height;
       if (ratio > 1.0) { // Horizontal
+        bottom = -1 / ratio;
+        top = 1 / ratio;
+      } else { // Vertical
         left = -ratio;
         right = ratio;
-      } else { // Vertical
-        bottom = - (1 / ratio);
-        top = 1 / ratio;
       }
 
-      Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+      Matrix.setIdentityM(mProjectionMatrix, 0);
+      //Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+      Log.d(TAG, mProjectionMatrix.toString());
     }
   }
 
@@ -270,23 +272,23 @@ public class LessonOneRenderer implements GLSurfaceView.Renderer {
       GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
       long time = SystemClock.uptimeMillis() % 5000L;
-      float angleInDregrees = (360.0f / 5000.0f) * ((int) time);
+      float angleInDregrees = 0.0f;//(360.0f / 5000.0f) * ((int) time);
 
       Matrix.setIdentityM(mModelMatrix, 0);
       Matrix.rotateM(mModelMatrix, 0, angleInDregrees, 0.0f, 0.0f, 1.0f);
       drawTriangle(mTriangle1Vertices);
 
-      Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(mModelMatrix, 0, 0.0f, -1.0f, 0.0f);
-      Matrix.rotateM(mModelMatrix, 0, 90.0f, 1.0f, 0.0f, 0.0f);
-      Matrix.rotateM(mModelMatrix, 0, angleInDregrees, 0.0f, 0.0f, 1.0f);
-      drawTriangle(mTriangle2Vertices);
-
-      Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(mModelMatrix, 0, 1.0f, 0.0f, 0.0f);
-      Matrix.rotateM(mModelMatrix, 0, 90.0f, 0.0f, 1.0f, 0.0f);
-      Matrix.rotateM(mModelMatrix, 0, angleInDregrees, 0.0f, 0.0f, 1.0f);
-      drawTriangle(mTriangle3Vertices);
+//      Matrix.setIdentityM(mModelMatrix, 0);
+//      Matrix.translateM(mModelMatrix, 0, 0.0f, -1.0f, 0.0f);
+//      Matrix.rotateM(mModelMatrix, 0, 90.0f, 1.0f, 0.0f, 0.0f);
+//      Matrix.rotateM(mModelMatrix, 0, angleInDregrees, 0.0f, 0.0f, 1.0f);
+//      drawTriangle(mTriangle2Vertices);
+//
+//      Matrix.setIdentityM(mModelMatrix, 0);
+//      Matrix.translateM(mModelMatrix, 0, 1.0f, 0.0f, 0.0f);
+//      Matrix.rotateM(mModelMatrix, 0, 90.0f, 0.0f, 1.0f, 0.0f);
+//      Matrix.rotateM(mModelMatrix, 0, angleInDregrees, 0.0f, 0.0f, 1.0f);
+//      drawTriangle(mTriangle3Vertices);
     }
   }
 
